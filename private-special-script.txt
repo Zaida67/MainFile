@@ -1,5 +1,128 @@
+local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
-local VirtualUser = game:GetService("VirtualUser")
+local LocalPlayer = Players.LocalPlayer
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PrimeKenzouKeySystem"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 350, 0, 220)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -110)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Dark sleek background
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+-- RGB Border/Background Glow Effect
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 0, 0)),
+    ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 255, 0)),
+    ColorSequenceKeypoint.new(0.66, Color3.fromRGB(0, 0, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 0))
+})
+UIGradient.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Name = "Title"
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundTransparency = 1
+Title.Text = "Prime Kenzou Key System"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.Parent = MainFrame
+
+-- Key Input TextBox
+local KeyInput = Instance.new("TextBox")
+KeyInput.Name = "KeyInput"
+KeyInput.Size = UDim2.new(0, 280, 0, 45)
+KeyInput.Position = UDim2.new(0.5, -140, 0.4, -22)
+KeyInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+KeyInput.PlaceholderText = "Enter Key Here..."
+KeyInput.Text = ""
+KeyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.TextSize = 14
+KeyInput.Parent = MainFrame
+
+local KeyCorner = Instance.new("UICorner")
+KeyCorner.CornerRadius = UDim.new(0, 6)
+KeyCorner.Parent = KeyInput
+
+-- Submit Button
+local SubmitBtn = Instance.new("TextButton")
+SubmitBtn.Name = "SubmitBtn"
+SubmitBtn.Size = UDim2.new(0, 130, 0, 40)
+SubmitBtn.Position = UDim2.new(0.5, -65, 0.75, -20)
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+SubmitBtn.Text = "Verify Key"
+SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SubmitBtn.Font = Enum.Font.GothamBold
+SubmitBtn.TextSize = 14
+SubmitBtn.Parent = MainFrame
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 6)
+BtnCorner.Parent = SubmitBtn
+
+----------------------------------------------------
+-- LOGIC & ANIMATIONS
+----------------------------------------------------
+
+-- Smooth RGB Light Gradient Animation
+task.spawn(function()
+    local rot = 0
+    while task.wait(0.02) do
+        rot = (rot + 2) % 360
+        UIGradient.Rotation = rot
+    end
+end)
+
+-- Key Validation Configuration
+local CORRECT_KEY = "PrimeKenzou"
+
+local function onVerify()
+    local enteredKey = KeyInput.Text
+    
+    if enteredKey == CORRECT_KEY then
+        SubmitBtn.Text = "Access Granted!"
+        SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 0)
+        task.wait(1)
+        
+        -- Smoothly close the UI upon success
+        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local fadeOut = TweenService:Create(MainFrame, tweenInfo, {Position = UDim2.new(0.5, -175, 1.2, 0)})
+        fadeOut:Play()
+        fadeOut.Completed:Connect(function()
+            ScreenGui:Destroy()
+            
+            ------------------------------------------------
+            -- PUT YOUR SCRIPT/CHEAT CODE TO EXECUTE HERE:
+            print("Successfully authenticated Prime Kenzou!")
+            ------------------------------------------------
+        end)
+    else
+        -- Handle incorrect key behavior
+        SubmitBtn.Text = "Invalid Key!"
+        SubmitBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+        task.wait(1.5)
+        SubmitBtn.Text = "Verify Key"
+        SubmitBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    end
+end
+
+SubmitBtn.MouseButton1Click:Connect(onVerify)
 
 local function preventAFK()
     VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
